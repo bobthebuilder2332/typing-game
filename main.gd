@@ -75,6 +75,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if input.length() == 0: return
 		input = input.left(-1) # Negative values removes -n characters from the back of the string
 		InputTextboxLabel.text = input
+		spelling_warning()
 	
 	# Ignores non-printable characters outside ANSI keyboard keys (or similar)
 	if event.unicode < 32 or event.unicode > 126: return
@@ -82,6 +83,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	# Handles typing and user input
 	input += char(event.unicode)
 	InputTextboxLabel.text = input
+	spelling_warning()
 
 # Loads words from word list into array
 func load_words() -> void:
@@ -140,3 +142,16 @@ func spellcheck() -> void:
 	# Reenable typing for user input
 	InstructionsLabel.text = "Press ENTER for next word"
 	readyForNext = true
+
+# Changes input to orange to warn the user that they have a typo before submission
+func spelling_warning() -> void:
+	# Gets the first n characters of the target, where n is the length of the input
+	var targetPart = target.left(input.length())
+	
+	# Warns of typo (so far)
+	if input != targetPart:
+		InputTextboxLabel.modulate = Color.ORANGE
+	
+	# Resets if no typo (so far)
+	else:
+		InputTextboxLabel.modulate = Color.WHITE

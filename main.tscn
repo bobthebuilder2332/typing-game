@@ -21,7 +21,7 @@ offset_right = 396.0
 offset_bottom = 175.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 128
-text = "Hello, World!"
+text = "TargetWord"
 horizontal_alignment = 1
 
 [node name="InputDisplay" type="Label" parent="." unique_id=13587123]
@@ -55,6 +55,38 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
-text = "Press enter to load next word"
+text = "NextWord"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="." unique_id=2039807781]
+layout_mode = 0
+offset_right = 81.0
+offset_bottom = 89.0
+text = "Typed
+Correct
+Incorrect"
+
+[node name="TypedStat" type="Label" parent="." unique_id=1861363580]
+layout_mode = 0
+offset_left = 83.0
+offset_right = 123.0
+offset_bottom = 24.0
+text = "0"
+
+[node name="CorrectStat" type="Label" parent="." unique_id=1384970363]
+layout_mode = 0
+offset_left = 83.0
+offset_top = 28.0
+offset_right = 123.0
+offset_bottom = 77.0
+text = "0
+"
+
+[node name="IncorrectStat" type="Label" parent="." unique_id=197440193]
+layout_mode = 0
+offset_left = 83.0
+offset_top = 53.0
+offset_right = 123.0
+offset_bottom = 76.0
+text = "0"

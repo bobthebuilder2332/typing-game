@@ -4,11 +4,14 @@ extends Control
 @onready var target_label = $TargetWord
 @onready var input_label = $InputDisplay
 @onready var next_word_label = $NextWord
+@onready var typed_stat = $TypedStat
+@onready var correct_stat = $CorrectStat
+@onready var incorrect_stat= $IncorrectStat
 
 # Define variables
 var word_list: Array = []
 var word_to_type = ""
-var words_typed: int = 0
+var typed_words: int = 0
 var correct_words: int = 0
 var incorrect_words: int = 0
 var can_type: bool = true
@@ -18,6 +21,7 @@ func _ready():
 	target_label.visible = false
 	input_label.visible = false
 	next_word_label.visible = true
+	next_word_label.text = "Press enter for next word"
 	load_words()
 	
 	# Reads and handles player input
@@ -36,6 +40,12 @@ func _unhandled_input(event: InputEvent):
 				input_label.visible = true
 				next_word_label.visible = false
 				pick_random_word()
+			
+			# Do nothing if the user didn't type anything / prevent accidental key presses
+			elif input_label.text == "":
+				return
+			
+			# Check word spelling accuracy
 			else:
 				spell_check()
 				
@@ -80,17 +90,18 @@ func pick_random_word():
 
 # Checks word accuracy
 func spell_check():
-	words_typed += 1
+	typed_words += 1
+	typed_stat.text = str(typed_words)
 	
 	# Change word color to reflect accuracy
 	if word_to_type == input_label.text:
 		input_label.modulate = Color.GREEN
 		correct_words += 1
+		correct_stat.text = str(correct_words)
 	else:
 		input_label.modulate = Color.RED
 		incorrect_words += 1
+		incorrect_stat.text = str(incorrect_words)
 	
 	# Ready to load next word
 	next_word_label.visible = true
-
-# Load next word

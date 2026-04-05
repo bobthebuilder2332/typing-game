@@ -81,7 +81,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.unicode < 32 or event.unicode > 126: return
 	
 	# Handles typing and user input
-	input += char(event.unicode)
+	input += char(event.unicode).to_lower()
 	InputTextboxLabel.text = input
 	spelling_warning()
 
@@ -110,7 +110,7 @@ func random_word() -> void:
 	if lstWord.is_empty(): return
 	
 	# Picks new word from array randomly
-	target = lstWord.pick_random().strip_edges() # strip_edges() removes hidden characters and spaces (\n, tab, space, etc)
+	target = lstWord.pick_random().strip_edges().to_lower() # strip_edges() removes hidden characters and spaces (\n, tab, space, etc)
 	TargetWordLabel.text = target
 	
 	# Resets input textbox for next word
@@ -128,7 +128,7 @@ func spellcheck() -> void:
 	numTypedLabel.text = str(numTyped) # Remember to cast to string because labels are strings
 	
 	# If word is spelled correctly
-	if input.to_lower() == target: # Accepts all cases / not case-sensitive
+	if input == target: # Accepts all cases / not case-sensitive
 		numCorrect += 1
 		numCorrectLabel.text = str(numCorrect)
 		InputTextboxLabel.modulate = Color.GREEN

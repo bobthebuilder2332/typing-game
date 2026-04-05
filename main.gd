@@ -1,115 +1,142 @@
 extends Control
 
-# Waiting for all the child classes to load to avoid errors
-@onready var target_label = $TargetWord
-@onready var input_label = $InputDisplay
-@onready var next_word_label = $NextWord
-@onready var stats_label = $StatsLabel
-@onready var typed_stat = $TypedStat
-@onready var correct_stat = $CorrectStat
-@onready var incorrect_stat= $IncorrectStat
+# Declare nodes, uses @onready to avoid 'assign nothing to someting' errors
+@onready var TargetWordLabel = $TargetWord
+@onready var InputTextboxLabel = $InputTextbox
+@onready var InstructionsLabel = $Instructions
+@onready var StatsContainer = $StatsContainer
+@onready var numTypedLabel = $StatsContainer/numTyped
+@onready var numCorrectLabel = $StatsContainer/numCorrect
+@onready var numIncorrectLabel = $StatsContainer/numIncorrect
+@onready var btnStart = $StartButton
 
-# Define variables
-var word_list: Array = []
-var word_to_type = ""
-var typed_words: int = 0
-var correct_words: int = 0
-var incorrect_words: int = 0
-var can_type: bool = true
+# Declare variables
+var target: String = ""
+var input: String = ""
+var numTyped: int = 0
+var numCorrect: int = 0
+var numIncorrect: int = 0
+var lstWord: Array = []
+var canType: bool = false
+var readyForNext: bool = false
 
-# Runs when the game starts
-func _ready():
-	stats_label.visible = false
-	typed_stat.visible = false
-	correct_stat.visible = false
-	incorrect_stat.visible = false
-	target_label.visible = false
-	input_label.visible = false
-	next_word_label.text = "Press enter for next word"
+# Main function what runs when the game starts
+func _ready() -> void:
+	# Hide all UI execpt for the start button
+	TargetWordLabel.visible = false
+	InputTextboxLabel.visible = false
+	InstructionsLabel.visible = false
+	StatsContainer.visible = false # Visibility is an inherited state so all child labels also become invisible
+	btnStart.visible = true
+	
+	# Game setup
+	InstructionsLabel.text = "Type the word and press ENTER to submit"
 	load_words()
+	random_word()
+
+# Signal up from child button node
+func _on_start_button_pressed() -> void:
+	# Set playing status to true so user can interact
+	canType = true
 	
-	# Reads and handles player input
-func _unhandled_input(event: InputEvent):
-	if event is InputEventKey and event.pressed and can_type:
-		# Backspace handling
-		if event.keycode == KEY_BACKSPACE: # Keycode is used for modifier and action keys
-			if input_label.text.length() > 0:
-				input_label.text = input_label.text.left(-1)
+	# Show all UI execpt for the start button
+	btnStart.visible = false
+	TargetWordLabel.visible = true
+	InputTextboxLabel.visible = true
+	InstructionsLabel.visible = true
+	StatsContainer.visible = true	
+
+# Handles user inputs
+func _unhandled_input(event: InputEvent) -> void:
+	# Do nothing if the input is not a down key press
+	if not event is InputEventKey or not event.pressed: return # Avoids double input (1 on press 1 on release)
+	
+	# Handles enter key for submitting input and next word
+	# Goes above canType check because user uses enter to prompt next word but shouldn't be able to type on spellcheck screen
+	if event.keycode == KEY_ENTER:
+		if input.length() == 0: return # Avoids accidental submissions
 		
-		# Enter handling
-		elif event.keycode == KEY_ENTER:
-			# Ready to load next word
-			if next_word_label.text == "Press enter for next word":
-				stats_label.visible = true
-				typed_stat.visible = true
-				correct_stat.visible = true
-				incorrect_stat.visible = true
-				target_label.visible = true
-				input_label.visible = true
-				
-				next_word_label.text = "Press enter to submit word"
-				pick_random_word()
-			
-			# Do nothing if the user didn't type anything / prevent accidental key presses
-			elif input_label.text == "":
-				return
-			
-			# Check word spelling accuracy
-			else:
-				spell_check()
-				
-		
-		# Ignore modifier keys
-		elif event.unicode == 0:
+		# Next word
+		if readyForNext == true:
+			random_word()
+			InstructionsLabel.text = "Type the word and press ENTER to submit"
 			return
-		
-		# Typing the word
-		else:
-			var typed_char = char(event.unicode) # Unicode is used for character keys
-			input_label.text += typed_char
-
-# Loads words from file into an Array
-func load_words():
-	# Open the file
-	var file = FileAccess.open("res://English1k.txt", FileAccess.READ)
+			
+		# Submitting answer
+		if input.length() > 0:
+			spellcheck()
+			return
 	
-	if file:
-		# Read the whole thing as one big string
-		var content = file.get_as_text()
-		
-		# Split the string into an array by looking for new lines
-		word_list = content.split("\n", false)
-		
-		file.close()
-		print(word_list.size(), " words")
+	# Do nothing if game is loading (user not allowed to interact)
+	if not canType: return
+	
+	# Handles backspace
+	if event.keycode == KEY_BACKSPACE:
+		if input.length() == 0: return
+		input = input.left(-1) # Negative values removes -n characters from the back of the string
+		InputTextboxLabel.text = input
+	
+	# Ignores non-printable characters outside ANSI keyboard keys (or similar)
+	if event.unicode < 32 or event.unicode > 126: return
+	
+	# Handles typing and user input
+	input += char(event.unicode)
+	InputTextboxLabel.text = input
+
+# Loads words from word list into array
+func load_words() -> void:
+	if not FileAccess.file_exists("res://WordList.txt"):
+		print ("Error: WordList.txt not found")
+		return
+	
+	var file = FileAccess.open("res://WordList.txt", FileAccess.READ)
+	
+	# Retuns the content of the file as a textwall with newline (\n) characters
+	var fileContent = file.get_as_text()
+	
+	# Splits the textwall into words, removing all \n and empty spaces
+	lstWord = fileContent.split("\n", false)
+	file.close() # Good practice to not leave files 'hanging open'
+
+# Picks a random word from the word array and resets input textbox
+func random_word() -> void:
+	# Reset flag variables
+	readyForNext = false
+	canType = true
+	
+	# Prevents error when trying to pick random from empty array
+	if lstWord.is_empty(): return
+	
+	# Picks new word from array randomly
+	target = lstWord.pick_random().strip_edges() # strip_edges() removes hidden characters and spaces (\n, tab, space, etc)
+	TargetWordLabel.text = target
+	
+	# Resets input textbox for next word
+	input = ""
+	InputTextboxLabel.text = ""
+	InputTextboxLabel.modulate = Color.WHITE
+
+# Check the spelling of the user input with indicator and adjust stats
+func spellcheck() -> void:
+	# Disable typing while checking
+	canType = false
+	
+	# Increment the number of words typed
+	numTyped += 1
+	numTypedLabel.text = str(numTyped) # Remember to cast to string because labels are strings
+	
+	# If word is spelled correctly
+	if input.to_lower() == target: # Accepts all cases / not case-sensitive
+		numCorrect += 1
+		numCorrectLabel.text = str(numCorrect)
+		InputTextboxLabel.modulate = Color.GREEN
+	
+	# Spelled incorrectly
 	else:
-		print("Error: Could not find the word list file.")
-
-# Pick a random word from the list
-func pick_random_word():
-	input_label.modulate = Color.WHITE
+		numIncorrect += 1
+		numIncorrectLabel.text = str(numIncorrect)
+		InputTextboxLabel.modulate = Color.RED
 	
-	if word_list.size() > 0:
-		# Pick a random index from the array
-		var random_index = randi() % word_list.size()
-		word_to_type = word_list[random_index].strip_edges() # strip_edges removes hidden spaces
-		target_label.text = word_to_type
-		input_label.text = ""
-
-# Checks word accuracy
-func spell_check():
-	typed_words += 1
-	typed_stat.text = str(typed_words)
-	
-	# Change word color to reflect accuracy
-	if word_to_type == input_label.text:
-		input_label.modulate = Color.GREEN
-		correct_words += 1
-		correct_stat.text = str(correct_words)
-	else:
-		input_label.modulate = Color.RED
-		incorrect_words += 1
-		incorrect_stat.text = str(incorrect_words)
-	
-	# Ready to load next word
-	next_word_label.text = "Press enter for next word"
+	# Reenable typing for user input
+	InstructionsLabel.text = "Press ENTER for next word"
+	readyForNext = true

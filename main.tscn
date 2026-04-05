@@ -12,6 +12,7 @@ grow_vertical = 2
 script = ExtResource("1_ig7tw")
 
 [node name="TargetWord" type="Label" parent="." unique_id=1073178381]
+visible = false
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -24,7 +25,7 @@ theme_override_font_sizes/font_size = 128
 text = "TargetWord"
 horizontal_alignment = 1
 
-[node name="InputDisplay" type="Label" parent="." unique_id=13587123]
+[node name="InputTextbox" type="Label" parent="." unique_id=13587123]
 layout_mode = 1
 anchors_preset = 7
 anchor_left = 0.5
@@ -37,11 +38,11 @@ offset_right = 305.5
 grow_horizontal = 2
 grow_vertical = 0
 theme_override_font_sizes/font_size = 100
-text = "InputDisplay"
+text = "InputTextbox"
 horizontal_alignment = 1
 vertical_alignment = 2
 
-[node name="NextWord" type="Label" parent="." unique_id=87747173]
+[node name="Instructions" type="Label" parent="." unique_id=87747173]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -55,38 +56,54 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
-text = "NextWord"
+text = "Press 'enter' to submit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="StatsLabel" type="Label" parent="." unique_id=2039807781]
-layout_mode = 0
-offset_right = 81.0
-offset_bottom = 89.0
-text = "Typed
-Correct
-Incorrect"
+[node name="StartButton" type="Button" parent="." unique_id=812242255]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = -15.5
+offset_right = 23.0
+offset_bottom = 15.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 70
+text = "Start Game"
 
-[node name="TypedStat" type="Label" parent="." unique_id=1861363580]
-layout_mode = 0
-offset_left = 83.0
-offset_right = 123.0
-offset_bottom = 24.0
-text = "0"
-
-[node name="CorrectStat" type="Label" parent="." unique_id=1384970363]
-layout_mode = 0
-offset_left = 83.0
-offset_top = 28.0
-offset_right = 123.0
+[node name="StatsContainer" type="GridContainer" parent="." unique_id=1530185539]
+layout_mode = 1
+offset_right = 85.0
 offset_bottom = 77.0
-text = "0
-"
+columns = 2
 
-[node name="IncorrectStat" type="Label" parent="." unique_id=197440193]
-layout_mode = 0
-offset_left = 83.0
-offset_top = 53.0
-offset_right = 123.0
-offset_bottom = 76.0
+[node name="Typed" type="Label" parent="StatsContainer" unique_id=403730326]
+layout_mode = 2
+text = "Typed"
+
+[node name="numTyped" type="Label" parent="StatsContainer" unique_id=1300088018]
+layout_mode = 2
 text = "0"
+
+[node name="Correct" type="Label" parent="StatsContainer" unique_id=1917069847]
+layout_mode = 2
+text = "Correct"
+
+[node name="numCorrect" type="Label" parent="StatsContainer" unique_id=2107795153]
+layout_mode = 2
+text = "0"
+
+[node name="Incorrect" type="Label" parent="StatsContainer" unique_id=652508729]
+layout_mode = 2
+text = "Incorrect"
+
+[node name="numIncorrect" type="Label" parent="StatsContainer" unique_id=1482445824]
+layout_mode = 2
+text = "0"
+
+[connection signal="pressed" from="StartButton" to="." method="_on_start_button_pressed"]

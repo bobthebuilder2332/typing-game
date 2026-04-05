@@ -3,6 +3,7 @@ extends Control
 # Waiting for all the child classes to load to avoid errors
 @onready var target_label = $TargetWord
 @onready var input_label = $InputDisplay
+@onready var next_word_label = $NextWord
 
 # Define variables
 var word_list: Array = []
@@ -14,8 +15,10 @@ var can_type: bool = true
 
 # Runs when the game starts
 func _ready():
+	target_label.visible = false
+	input_label.visible = false
+	next_word_label.visible = true
 	load_words()
-	pick_random_word()
 	
 	# Reads and handles player input
 func _unhandled_input(event: InputEvent):
@@ -27,7 +30,15 @@ func _unhandled_input(event: InputEvent):
 		
 		# Enter handling
 		elif event.keycode == KEY_ENTER:
-			pass
+			# Ready to load next word
+			if next_word_label.visible == true:
+				target_label.visible = true
+				input_label.visible = true
+				next_word_label.visible = false
+				pick_random_word()
+			else:
+				spell_check()
+				
 		
 		# Ignore modifier keys
 		elif event.unicode == 0:
@@ -51,12 +62,15 @@ func load_words():
 		word_list = content.split("\n", false)
 		
 		file.close()
-		print("Loaded ", word_list.size(), " words!")
+		print(word_list.size(), " words")
 	else:
 		print("Error: Could not find the word list file.")
 
 # Pick a random word from the list
 func pick_random_word():
+	input_label.modulate = Color.WHITE
+	next_word_label.visible = false
+	
 	if word_list.size() > 0:
 		# Pick a random index from the array
 		var random_index = randi() % word_list.size()
@@ -65,3 +79,18 @@ func pick_random_word():
 		input_label.text = ""
 
 # Checks word accuracy
+func spell_check():
+	words_typed += 1
+	
+	# Change word color to reflect accuracy
+	if word_to_type == input_label.text:
+		input_label.modulate = Color.GREEN
+		correct_words += 1
+	else:
+		input_label.modulate = Color.RED
+		incorrect_words += 1
+	
+	# Ready to load next word
+	next_word_label.visible = true
+
+# Load next word

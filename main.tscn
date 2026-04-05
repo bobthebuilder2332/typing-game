@@ -40,3 +40,21 @@ theme_override_font_sizes/font_size = 100
 text = "InputDisplay"
 horizontal_alignment = 1
 vertical_alignment = 2
+
+[node name="NextWord" type="Label" parent="." unique_id=87747173]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -114.0
+offset_top = -11.5
+offset_right = 114.0
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+text = "Press enter to load next word"
+horizontal_alignment = 1
+vertical_alignment = 1

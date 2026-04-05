@@ -4,6 +4,7 @@ extends Control
 @onready var target_label = $TargetWord
 @onready var input_label = $InputDisplay
 @onready var next_word_label = $NextWord
+@onready var stats_label = $StatsLabel
 @onready var typed_stat = $TypedStat
 @onready var correct_stat = $CorrectStat
 @onready var incorrect_stat= $IncorrectStat
@@ -18,9 +19,12 @@ var can_type: bool = true
 
 # Runs when the game starts
 func _ready():
+	stats_label.visible = false
+	typed_stat.visible = false
+	correct_stat.visible = false
+	incorrect_stat.visible = false
 	target_label.visible = false
 	input_label.visible = false
-	next_word_label.visible = true
 	next_word_label.text = "Press enter for next word"
 	load_words()
 	
@@ -35,10 +39,15 @@ func _unhandled_input(event: InputEvent):
 		# Enter handling
 		elif event.keycode == KEY_ENTER:
 			# Ready to load next word
-			if next_word_label.visible == true:
+			if next_word_label.text == "Press enter for next word":
+				stats_label.visible = true
+				typed_stat.visible = true
+				correct_stat.visible = true
+				incorrect_stat.visible = true
 				target_label.visible = true
 				input_label.visible = true
-				next_word_label.visible = false
+				
+				next_word_label.text = "Press enter to submit word"
 				pick_random_word()
 			
 			# Do nothing if the user didn't type anything / prevent accidental key presses
@@ -79,7 +88,6 @@ func load_words():
 # Pick a random word from the list
 func pick_random_word():
 	input_label.modulate = Color.WHITE
-	next_word_label.visible = false
 	
 	if word_list.size() > 0:
 		# Pick a random index from the array
@@ -104,4 +112,4 @@ func spell_check():
 		incorrect_stat.text = str(incorrect_words)
 	
 	# Ready to load next word
-	next_word_label.visible = true
+	next_word_label.text = "Press enter for next word"

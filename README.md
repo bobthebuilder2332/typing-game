@@ -17,10 +17,3 @@ A simple and minimalistic typing game built with GDScript. Test your typing accu
     * Clone this repository
     * Open repository in Godot 4
     * Click run button in top right (or F5 / Cmd + B)
-
-## Media
-
-![Typing Game Demo](./Media/Screen%20Recording%202026-04-08%20at%2013.26.37.gif)
-![Correct Answer](./Media/Screenshot%202026-04-06%20at%2011.37.34%20(2).png)
-![Incorrect Answer](./Media/Screenshot%202026-04-06%20at%2011.37.51%20(2).png)
-![Typo Before Submit](./Media/Screenshot%202026-04-06%20at%2011.37.48%20(2).png)
